@@ -6,7 +6,8 @@ import type { Project } from '../core/project.ts';
 
 const fadeIO = (t: number, t0: number, t1: number, f = 0.4) => Math.max(0, Math.min(1, (t - t0) / f, (t1 - t) / f));
 
-export function drawOverlay(ctx: CanvasRenderingContext2D, t: number, W: number, H: number, plan: Plan, project: Project): void {
+/** `fades`: draw the fades from and to black (the editor leaves them out while it is paused). */
+export function drawOverlay(ctx: CanvasRenderingContext2D, t: number, W: number, H: number, plan: Plan, project: Project, fades = true): void {
   const theme = project.theme;
   const titles = project.titles;
   const hud = plan.hud;
@@ -88,7 +89,7 @@ export function drawOverlay(ctx: CanvasRenderingContext2D, t: number, W: number,
     ctx.restore();
   }
   const fin = Math.max(0, 1 - t / 0.6), fout = Math.max(0, 1 - (dur - t) / 0.8);
-  const f = Math.max(fin, fout);
+  const f = fades ? Math.max(fin, fout) : 0;
   if (f > 0) {
     ctx.fillStyle = `rgba(0,0,0,${f})`;
     ctx.fillRect(0, 0, W, H);

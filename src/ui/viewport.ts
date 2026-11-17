@@ -131,7 +131,8 @@ export class Viewport {
     return { position: [o.x, o.y, o.dist] as [number, number, number], target: [o.x, o.y, 0] as [number, number, number], fov: 40 };
   }
 
-  render(t: number): void {
+  /** `playing`: the film fades from and to black only while it plays. */
+  render(t: number, playing = false): void {
     const plan = this.engine.plan;
     this.#lastT = t;
     this.dirty = false;
@@ -139,7 +140,7 @@ export class Viewport {
     ctx.clearRect(0, 0, this.#overlay.width, this.#overlay.height);
     if (!plan || !this.stage.plan) { this.#svg.replaceChildren(); return; }
     this.stage.renderAt(t, this.mode === 'overview' ? this.#view() : null);
-    if (this.mode === 'film') drawOverlay(ctx, t, this.#overlay.width, this.#overlay.height, plan, this.store.project);
+    if (this.mode === 'film') drawOverlay(ctx, t, this.#overlay.width, this.#overlay.height, plan, this.store.project, playing);
     this.#drawHandles(t);
   }
 
