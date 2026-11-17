@@ -73,7 +73,7 @@ export function slider(o: SliderOpts): Control {
     const v = o.get();
     if (!focused(input)) input.value = String(v);
     out.textContent = fmt(v);
-    if (resetBtn) resetBtn.hidden = !(o.isCustom?.() ?? true);
+    if (resetBtn) resetBtn.style.visibility = (o.isCustom?.() ?? true) ? '' : 'hidden';
   };
   refresh();
   return { el, refresh };
