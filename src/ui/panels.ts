@@ -407,7 +407,7 @@ const artTab: TabDef = {
 const WALLS: [WallStyle, string][] = [['plaster', 'Plaster'], ['smooth', 'Smooth'], ['concrete', 'Concrete'], ['brick', 'Brick'], ['planks', 'Planks']];
 
 const sceneTab: TabDef = {
-  id: 'scene', label: 'Scene', icon: '◐',
+  id: 'scene', label: 'Scene', icon: '☀',
   build(app) {
     const { store } = app;
     const p = () => store.project;
