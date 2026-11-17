@@ -78,8 +78,9 @@ encoder must encode a small test file, as in Orchestra, so a broken hardware enc
 a software one. Keep the tab open while it renders. Use a current Chrome, Edge or Safari; Firefox
 can render too, with Opus audio.
 
-On a GPU, a 1-minute 1080p60 video takes about 1 to 3 minutes at High. Without a GPU, WebGL runs
-on the CPU and is much slower.
+The speed depends on the GPU: High draws 4 sub-frames per frame and Ultra 8. Without a GPU, WebGL
+runs on the CPU and is much slower (in a test container with software WebGL, a 720p Draft render
+ran at about 1 frame per second).
 
 ## Run locally
 
