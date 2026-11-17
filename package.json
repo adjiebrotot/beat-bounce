@@ -1,0 +1,35 @@
+{
+  "name": "beat-bounce",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Beat Bounce: a marble bounces down a wall of bars, one bounce per note of your MIDI file. Customize it and render an MP4 in the browser.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "demo-midi": "node tools/make-demo.mjs",
+    "smoke": "node tools/smoke.mjs"
+  },
+  "dependencies": {
+    "@tonejs/midi": "2.0.28",
+    "mp4-muxer": "5.2.1",
+    "postprocessing": "6.36.4",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.170.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.8"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "packageManager": "pnpm@10.8.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
