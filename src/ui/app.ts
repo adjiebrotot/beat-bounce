@@ -365,7 +365,8 @@ export class App implements AppApi {
         button('Load the demo song', () => this.loadDemo(), 'menu-item'),
         button('Export project…', () => void this.#exportProject(), 'menu-item', 'A .json file with the MIDI and the pictures inside'),
         button('Import project…', () => void this.#importProject(), 'menu-item'),
-        button('New empty project', () => this.#newProject(), 'menu-item')));
+        button('New empty project', () => this.#newProject(), 'menu-item'),
+        h('a', { class: 'menu-item', href: `${BASE}third-party-licenses.txt`, target: '_blank', rel: 'noopener', text: 'Third-party licenses' })));
     menu.addEventListener('click', (e) => { if ((e.target as Element).classList.contains('menu-item')) menu.open = false; });
     const header = h('header', { class: 'top' },
       h('div', { class: 'brand' }, h('span', { class: 'logo', 'aria-hidden': 'true' }), h('span', { text: 'Beat Bounce' })),
