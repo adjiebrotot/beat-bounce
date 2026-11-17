@@ -242,6 +242,7 @@ export async function buildOrnament(o: Ornament, images: ImageProvider): Promise
 export function placeOrnament(g: THREE.Object3D, o: Pick<Ornament, 'x' | 'y' | 'rotation'>): void {
   g.position.set(o.x, o.y, 0);
   g.rotation.set(0, 0, (o.rotation * Math.PI) / 180);
+  g.scale.setScalar(1);
 }
 
 export function disposeObject(obj: THREE.Object3D): void {

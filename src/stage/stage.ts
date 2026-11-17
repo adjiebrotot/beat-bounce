@@ -602,9 +602,12 @@ export class Stage {
   }
 
   /** Moves an ornament at once, while the user drags it (the project commits at the end). */
-  moveOrnament(o: Pick<Ornament, 'id' | 'x' | 'y' | 'rotation'>): void {
+  moveOrnament(o: Pick<Ornament, 'id' | 'x' | 'y' | 'rotation'>, scale = 1): void {
     const g = this.#ornaments.get(o.id)?.group;
-    if (g) placeOrnament(g, o);
+    if (g) {
+      placeOrnament(g, o);
+      g.scale.setScalar(scale);
+    }
   }
 
   // ---------------------------------------------------------------------------------------------------
