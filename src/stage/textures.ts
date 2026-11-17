@@ -186,7 +186,7 @@ export function wallTextures(style: WallStyle, color: string, bump: number, seed
   ca.getContext('2d')!.putImageData(ia, 0, 0); cn.getContext('2d')!.putImageData(inn, 0, 0); cr.getContext('2d')!.putImageData(ir, 0, 0);
   const out: WallTextures = {
     map: canvasTexture(ca, true, true), normalMap: canvasTexture(cn, false, true), roughnessMap: canvasTexture(cr, false, true),
-    natural: style === 'brick' ? 2.0 : style === 'planks' ? 1.6 : 3.5,
+    natural: style === 'brick' ? 3.0 : style === 'planks' ? 2.2 : 3.5,
   };
   for (const t of [out.map, out.normalMap, out.roughnessMap]) t.userData['shared'] = true;
   if (wallCache.size > 6) wallCache.clear();
