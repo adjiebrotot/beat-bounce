@@ -281,16 +281,35 @@ export function buildPlan(song: Song, input: PlanInput, now: () => number = () =
   };
 }
 
-/** A good spot for a new ornament of size w x h at video time t: beside the ball, inside the view. */
-export function spotNear(plan: Plan, t: number, w: number, h: number): V2 {
+/**
+ * A good spot for a new ornament of size w x h at video time t: inside the view of the film camera,
+ * clear of the ball's path from a few seconds before t to a few seconds after, and of the bars there.
+ */
+export function spotNear(plan: Plan, t: number, w: number, h: number, avoid: { x: number; y: number; r: number }[] = []): V2 {
   const cam = plan.camera;
   const i = Math.max(0, Math.min(cam.track.length / 2 - 1, Math.round(t * cam.hz)));
-  const cx = cam.track[2 * i]!, cy = cam.track[2 * i + 1]!;
-  const j = Math.max(0, Math.min(plan.ball.track.length / 3 - 1, Math.round(t * plan.ball.hz)));
-  const bx = plan.ball.track[3 * j]!;
-  const side = bx > cx ? -1 : 1;
-  const room = Math.max(0, cam.viewHalfW * 0.92 - w / 2);
-  return [cx + side * Math.min(room, cam.viewHalfW * 0.5), cy - cam.lookDown * 0.3 + Math.max(0, 0.2 - h * 0.05)];
+  const cx = cam.track[2 * i]!, cy = cam.track[2 * i + 1]! - cam.lookDown * 0.5;
+  const pts: V2[] = [];
+  const n = plan.ball.track.length / 3;
+  for (let s = Math.max(0, t - 4); s <= t + 8; s += 1 / 30) {
+    const j = Math.min(n - 1, Math.round(s * plan.ball.hz));
+    pts.push([plan.ball.track[3 * j]!, plan.ball.track[3 * j + 1]!]);
+  }
+  for (const p of plan.paddles) if (p.t > t - 5 && p.t < t + 9) pts.push([p.cx, p.cy]);
+  const r = Math.max(w, h) / 2;
+  let best: V2 = [cx, cy], bestScore = -Infinity;
+  for (let gy = -2; gy <= 2; gy++) {
+    for (let gx = -4; gx <= 4; gx++) {
+      const x = cx + (gx / 4) * Math.max(0, cam.viewHalfW * 0.85 - w / 2);
+      const y = cy + (gy / 2) * Math.max(0, cam.viewHalfH * 0.55 - h / 2);
+      let clear = Infinity;
+      for (const [px, py] of pts) clear = Math.min(clear, Math.hypot(px - x, py - y) - r);
+      for (const a of avoid) clear = Math.min(clear, Math.hypot(a.x - x, a.y - y) - r - a.r);
+      const score = Math.min(clear, 0.9) * 3 - Math.hypot((x - cx) / cam.viewHalfW, (y - cy) / cam.viewHalfH) * 0.6;
+      if (score > bestScore) { bestScore = score; best = [x, y]; }
+    }
+  }
+  return best;
 }
 
 /** Rectangle helper re-exported for the editor. */

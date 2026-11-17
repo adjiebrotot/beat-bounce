@@ -47,6 +47,8 @@ export class App implements AppApi {
   #renderDialog!: RenderDialog;
   #rendering = false;
   #seedDemoArt = false;
+  /** Search a clean layout once the plan with the demo art is ready. */
+  #cleanDemo = false;
   #searching = false;
   #lastAspect: AspectName | null = null;
 
@@ -123,7 +125,8 @@ export class App implements AppApi {
     }
     if (kind === 'photo' && image) { o = { ...o, image } as Ornament; }
     const { w, h: hh } = ornamentSize(o);
-    const [x, y] = at ?? (this.viewport.mode === 'overview' ? this.viewport.viewCentre() : spotNear(plan, t, w, hh));
+    const others = this.store.project.ornaments.filter((q) => !q.hidden).map((q) => { const sz = ornamentSize(q); return { x: q.x, y: q.y, r: Math.max(sz.w, sz.h) / 2 }; });
+    const [x, y] = at ?? (this.viewport.mode === 'overview' ? this.viewport.viewCentre() : spotNear(plan, t, w, hh, others));
     o.x = Math.round(x * 100) / 100;
     o.y = Math.round(y * 100) / 100;
     this.store.update((p) => { p.ornaments.push(o); });
@@ -231,12 +234,13 @@ export class App implements AppApi {
     const at = [4.5, 15, 27, 40, 56];
     [title, photo, note, star, neon].forEach((o, i) => {
       const { w, h: hh } = ornamentSize(o);
-      const [x, y] = spotNear(plan, Math.min(at[i]!, plan.meta.duration - 2), w, hh);
+      const [x, y] = spotNear(plan, Math.min(at[i]!, plan.meta.duration - 2), w, hh, items.map((q) => { const sz = ornamentSize(q); return { x: q.x, y: q.y, r: Math.max(sz.w, sz.h) / 2 }; }));
       o.x = Math.round(x * 100) / 100;
       o.y = Math.round(y * 100) / 100;
       items.push(o);
     });
     this.store.update((p) => { p.ornaments.push(...items); }, { history: false });
+    this.#cleanDemo = true;
   }
 
   async #loadMidiFile(file: File): Promise<void> {
@@ -465,6 +469,10 @@ export class App implements AppApi {
       if (this.player.time > plan.meta.duration) this.player.seek(plan.meta.duration);
       this.#updateMarkers();
       if (this.#seedDemoArt) this.#placeDemoArt();
+      else if (this.#cleanDemo && !this.engine.planning) {
+        this.#cleanDemo = false;
+        if (plan.stats.forced > 0) this.findCleanLayout();
+      }
     }
     this.#refreshPanel();
     this.#updateStatus();
@@ -519,7 +527,7 @@ export class App implements AppApi {
   #loop = (): void => {
     this.player.tick();
     if ((this.player.playing || this.viewport.dirty) && !this.#rendering) {
-      this.viewport.render(this.player.time);
+      this.viewport.render(this.player.time, this.player.playing);
       this.#updateTransport();
     }
     requestAnimationFrame(this.#loop);
