@@ -302,10 +302,11 @@ export function spotNear(plan: Plan, t: number, w: number, h: number, avoid: { x
     for (let gx = -4; gx <= 4; gx++) {
       const x = cx + (gx / 4) * Math.max(0, cam.viewHalfW * 0.85 - w / 2);
       const y = cy + (gy / 2) * Math.max(0, cam.viewHalfH * 0.55 - h / 2);
-      let clear = Infinity;
+      let clear = Infinity, art = Infinity;
       for (const [px, py] of pts) clear = Math.min(clear, Math.hypot(px - x, py - y) - r);
-      for (const a of avoid) clear = Math.min(clear, Math.hypot(a.x - x, a.y - y) - r - a.r);
-      const score = Math.min(clear, 0.9) * 3 - Math.hypot((x - cx) / cam.viewHalfW, (y - cy) / cam.viewHalfH) * 0.6;
+      for (const a of avoid) art = Math.min(art, Math.hypot(a.x - x, a.y - y) - r - a.r);
+      // overlapping other art is worse than being near the path
+      const score = Math.min(clear, 0.9) * 3 + Math.min(art, 0.3) * 8 - Math.hypot((x - cx) / cam.viewHalfW, (y - cy) / cam.viewHalfH) * 0.6;
       if (score > bestScore) { bestScore = score; best = [x, y]; }
     }
   }
