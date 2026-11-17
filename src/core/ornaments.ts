@@ -4,7 +4,7 @@
 import { turnedRect } from './geometry.ts';
 import type { Rect } from './geometry.ts';
 import { CROPS } from './project.ts';
-import type { Ornament, PhotoOrnament } from './project.ts';
+import type { Ornament, PhotoOrnament, StickerOrnament } from './project.ts';
 
 export interface PhotoLayout {
   picW: number;
@@ -64,14 +64,23 @@ export function photoLayout(o: PhotoOrnament): PhotoLayout {
   };
 }
 
+/** Width of the die-cut border of a sticker, metres. */
+export function stickerBorder(o: StickerOrnament): number {
+  return Math.max(0, Math.min(0.2, o.border)) * o.width;
+}
+
 /** Width and height of the footprint of an ornament. */
 export function ornamentSize(o: Ornament): { w: number; h: number } {
   if (o.kind === 'photo') {
     const L = photoLayout(o);
     return { w: L.totalW, h: L.totalH };
   }
-  const aspect = o.kind === 'sticker' ? o.imageAspect : o.textAspect;
-  return { w: o.width, h: o.width / Math.max(0.05, aspect || 1) };
+  if (o.kind === 'sticker') {
+    // the die-cut border goes around the picture: width = picture + 2 borders
+    const b = stickerBorder(o);
+    return { w: o.width, h: (o.width - 2 * b) / Math.max(0.05, o.imageAspect || 1) + 2 * b };
+  }
+  return { w: o.width, h: o.width / Math.max(0.05, o.textAspect || 1) };
 }
 
 /** The footprint as an oriented rectangle on the wall, grown by `pad` metres on each side. */
